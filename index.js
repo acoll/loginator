@@ -3,7 +3,12 @@ var colors = require('colors');
 function makeLogger (names, parentLogger) {
 
 	function log(level, args) {
-		names.forEach(n => [].unshift.call(args, '[' + n + ']'));
+
+		names.forEach(n => {
+			var val = n;
+			if(typeof(n) === 'function') val = n();
+			[].unshift.call(args, '[' + val + ']');
+		});
 		[].unshift.call(args, level);
 		console.log.apply(console, args);
 	};

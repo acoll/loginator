@@ -9,6 +9,10 @@ logger.debug('hello');
 
 var sub = logger('more more');
 
+var sub2 = logger(() => (new Date));
+
+sub2.info('bleh');
+
 sub.useColors = true;
 sub.showWarn = true;
 sub.info('stuff in sub');
