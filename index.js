@@ -9,8 +9,11 @@ function makeLogger (names, parentLogger) {
 			if(typeof(n) === 'function') val = n();
 			[].unshift.call(args, '[' + val + ']');
 		});
-		[].unshift.call(args, level);
-		console.log.apply(console, args);
+		[].unshift.call(args, '[' + level + ']');
+
+		var consoleFn = console[level.toLowerCase()] || console.log;
+
+		consoleFn.apply(console, args);
 	};
 
 	function logger (name) {
@@ -34,28 +37,28 @@ function makeLogger (names, parentLogger) {
 
 	logger.info = function () {
 		if(!logger.showInfo) return;
-		var level = '[INFO ]';
+		var level = 'INFO';
 		if(logger.useColors) level = level.green;
 		log(level, arguments);
 	};
 
 	logger.debug = function () {
 		if(!logger.showDebug) return;
-		var level = '[DEBUG]';
+		var level = 'DEBUG';
 		if(logger.useColors) level = level.magenta;
 		log(level, arguments);
 	};
 
 	logger.warn = function () {
 		if(!logger.showWarn) return;
-		var level = '[WARN ]';
+		var level = 'WARN';
 		if(logger.useColors) level = level.yellow;
 		log(level, arguments);
 	};
 
 	logger.error = function () {
 		if(!logger.showError) return;
-		var level = '[ERROR]';
+		var level = 'ERROR';
 		if(logger.useColors) level = level.red;
 		log(level, arguments);
 	};
