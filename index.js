@@ -4,7 +4,7 @@ function makeLogger (names, parentLogger) {
 
 	function log(level, args) {
 
-		names.forEach(n => {
+		names.forEach(function(n) {
 			var val = n;
 			if(typeof(n) === 'function') val = n();
 			[].unshift.call(args, '[' + val + ']');
