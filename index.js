@@ -17,13 +17,13 @@ function makeLogger (names, parentLogger) {
 	};
 
 	function logger (name) {
-		if(!this.loggers) this.loggers = {};
+		if(!logger.loggers) logger.loggers = {};
 
-		if(this.loggers[name]) return this.loggers[name];
+		if(logger.loggers[name]) return logger.loggers[name];
 
 		var newLogger = makeLogger([name].concat(names), logger);
 
-		this.loggers[name] = newLogger;
+		logger.loggers[name] = newLogger;
 
 		return newLogger;
 	};
