@@ -17,7 +17,15 @@ function makeLogger (names, parentLogger) {
 	};
 
 	function logger (name) {
-		return makeLogger([name].concat(names), logger);
+		if(!this.loggers) this.loggers = {};
+
+		if(this.loggers[name]) return this.loggers[name];
+
+		var newLogger = makeLogger([name].concat(names), logger);
+
+		this.loggers[name] = newLogger;
+
+		return newLogger;
 	};
 
 	if(parentLogger) {

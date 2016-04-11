@@ -18,7 +18,11 @@ userLogger.debug('Login event');
 
 // Make a child logger with a functin for the context value.
 var intervalLogger = userLogger(() => new Date);
-setInterval(() => intervalLogger.info('Hello Interval'), 2000);
+var intervalLoggerStatic = logger('STATIC');
+setInterval(() => {
+	intervalLogger.info('Hello Interval');
+	intervalLoggerStatic.debug('BLEH');
+}, 2000);
 
 var logger1 = logger('logger-1');
 
@@ -41,4 +45,11 @@ logger8.info('HELLO DEEP LOGGER');
 setTimeout(() => {
 	intervalLogger.debug('Yea lets do colors again.');
 	intervalLogger.useColors = true;
+
+	setTimeout(() => {
+		var staticAgain = logger('STATIC');
+		staticAgain.showDebug = false;
+		staticAgain.info('I DONT SHOW DEBUG ANYMORE');
+	}, 2000);
+
 }, 4000);
