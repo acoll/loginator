@@ -2,6 +2,7 @@ var colors = require('colors');
 
 var levels = {
 	LOG: 		'[ LOG ]'.magenta,
+	DEBUG: 	'[DEBUG]'.magenta,
 	INFO: 	'[INFO ]'.green,
 	WARN: 	'[WARN ]'.yellow,
 	ERROR: 	'[ERROR]'.red
@@ -10,14 +11,27 @@ var levels = {
 if(!console.logger) {
 
 	console.log = console.log.bind(console, levels.LOG);
+	console.debug = console.log.bind(console, levels.DEBUG);
 	console.info = console.info.bind(console, levels.INFO);
 	console.warn = console.warn.bind(console, levels.WARN);
 	console.error = console.error.bind(console, levels.ERROR);
 
 	function logger (thing) {
-		// console.log('Making new logger', thing, this);
-		var newConsole = Object.assign({ logger: logger }, this);
-		this.loggers = this.loggers || {};
+		if(!this.loggers) this.loggers = {};
+
+		var newConsole;
+		var noop = function () {};
+
+		if(this.loggers[thing]) newConsole = this.loggers[thing];
+		else newConsole = Object.assign({
+			logger: logger,
+			set: function (opts) {
+				['log', 'debug', 'info', 'warn', 'error'].forEach(level => {
+					if(opts[level] === false) newConsole[level] = noop;
+				});
+			}
+		}, this);
+
 		this.loggers[thing] = newConsole;
 		extendLogger(newConsole, thing);
 		return newConsole;
@@ -41,6 +55,10 @@ function extendLogger (c, thing) {
 			originals.log.bind(c, '[' + thing() + ']').apply(c, arguments);
 		};
 
+		c.debug = function () {
+			originals.log.bind(c, '[' + thing() + ']').apply(c, arguments);
+		};
+
 		c.info = function () {
 			originals.info.bind(c, '[' + thing() + ']').apply(c, arguments);
 		};
@@ -52,6 +70,7 @@ function extendLogger (c, thing) {
 		c.error = function () {
 			originals.error.bind(c, '[' + thing() + ']').apply(c, arguments);
 		};
+
 	} else {
 		var string = '[' + thing + ']';
 		c.log = c.log.bind(c, string);
