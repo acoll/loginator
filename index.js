@@ -10,8 +10,8 @@ var levels = {
 
 if(!console.logger) {
 
-	console.log = console.log.bind(console, levels.LOG);
 	console.debug = console.log.bind(console, levels.DEBUG);
+	console.log = console.log.bind(console, levels.LOG);
 	console.info = console.info.bind(console, levels.INFO);
 	console.warn = console.warn.bind(console, levels.WARN);
 	console.error = console.error.bind(console, levels.ERROR);
@@ -32,7 +32,9 @@ if(!console.logger) {
 			}
 		}, this);
 
-		this.loggers[thing] = newConsole;
+		if(typeof thing !== 'function') {
+			this.loggers[thing] = newConsole;
+		}
 		extendLogger(newConsole, thing);
 		return newConsole;
 	}
@@ -80,4 +82,7 @@ function extendLogger (c, thing) {
 	}
 }
 
-module.exports = console;
+module.exports = function (thing) {
+	extendLogger(console, thing);
+	return console;
+};
