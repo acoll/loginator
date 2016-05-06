@@ -1,78 +1,64 @@
 var colors = require('colors');
 
-function makeLogger (names, parentLogger) {
-
-	function log(level, args) {
-
-		names.forEach(function(n) {
-			var val = n;
-			if(typeof(n) === 'function') val = n();
-			[].unshift.call(args, '[' + val + ']');
-		});
-		[].unshift.call(args, '[' + level + ']');
-
-		var consoleFn = console[level.toLowerCase()] || console.log;
-
-		consoleFn.apply(console, args);
-	};
-
-	function logger (name) {
-		if(!logger.loggers) logger.loggers = {};
-
-		if(logger.loggers[name]) return logger.loggers[name];
-
-		var newLogger = makeLogger([name].concat(names), logger);
-
-		logger.loggers[name] = newLogger;
-
-		return newLogger;
-	};
-
-	if(parentLogger) {
-		logger.useColors = parentLogger.useColors;
-		logger.showInfo = parentLogger.showInfo;
-		logger.showDebug = parentLogger.showDebug;
-		logger.showWarn = parentLogger.showWarn;
-		logger.showError = parentLogger.showError;
-	} else {
-		logger.useColors = true;
-		logger.showInfo = true;
-		logger.showDebug = true;
-		logger.showWarn = true;
-		logger.showError = true;
-	}
-
-
-	logger.info = function () {
-		if(!logger.showInfo) return;
-		var level = 'INFO';
-		if(logger.useColors) level = level.green;
-		log(level, arguments);
-	};
-
-	logger.debug = function () {
-		if(!logger.showDebug) return;
-		var level = 'DEBUG';
-		if(logger.useColors) level = level.magenta;
-		log(level, arguments);
-	};
-
-	logger.warn = function () {
-		if(!logger.showWarn) return;
-		var level = 'WARN';
-		if(logger.useColors) level = level.yellow;
-		log(level, arguments);
-	};
-
-	logger.error = function () {
-		if(!logger.showError) return;
-		var level = 'ERROR';
-		if(logger.useColors) level = level.red;
-		log(level, arguments);
-	};
-
-	return logger;
+var levels = {
+	LOG: 		'[ LOG ]'.magenta,
+	INFO: 	'[INFO ]'.green,
+	WARN: 	'[WARN ]'.yellow,
+	ERROR: 	'[ERROR]'.red
 };
 
+if(!console.logger) {
 
-module.exports = makeLogger([]);
+	console.log = console.log.bind(console, levels.LOG);
+	console.info = console.info.bind(console, levels.INFO);
+	console.warn = console.warn.bind(console, levels.WARN);
+	console.error = console.error.bind(console, levels.ERROR);
+
+	function logger (thing) {
+		// console.log('Making new logger', thing, this);
+		var newConsole = Object.assign({ logger: logger }, this);
+		this.loggers = this.loggers || {};
+		this.loggers[thing] = newConsole;
+		extendLogger(newConsole, thing);
+		return newConsole;
+	}
+
+	console.logger = logger;
+}
+
+function extendLogger (c, thing) {
+
+	if( typeof thing === 'function') {
+
+		var originals = {
+			log: c.log,
+			info: c.info,
+			warn: c.warn,
+			error: c.error
+		};
+
+		c.log = function () {
+			originals.log.bind(c, '[' + thing() + ']').apply(c, arguments);
+		};
+
+		c.info = function () {
+			originals.info.bind(c, '[' + thing() + ']').apply(c, arguments);
+		};
+
+		c.warn = function () {
+			originals.warn.bind(c, '[' + thing() + ']').apply(c, arguments);
+		};
+
+		c.error = function () {
+			originals.error.bind(c, '[' + thing() + ']').apply(c, arguments);
+		};
+	} else {
+		var string = '[' + thing + ']';
+		c.log = c.log.bind(c, string);
+		c.info = c.info.bind(c, string);
+		c.warn = c.warn.bind(c, string);
+		c.error = c.error.bind(c, string);
+	}
+}
+
+module.exports = console;
