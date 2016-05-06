@@ -26,7 +26,7 @@ if(!console.logger) {
 		else newConsole = Object.assign({
 			logger: logger,
 			set: function (opts) {
-				['log', 'debug', 'info', 'warn', 'error'].forEach(level => {
+				['log', 'debug', 'info', 'warn', 'error'].forEach(function(level) {
 					if(opts[level] === false) newConsole[level] = noop;
 				});
 			}
