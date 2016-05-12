@@ -23,14 +23,21 @@ if(!console.logger) {
 		var noop = function () {};
 
 		if(this.loggers[thing]) newConsole = this.loggers[thing];
-		else newConsole = Object.assign({
-			logger: logger,
-			set: function (opts) {
-				['log', 'debug', 'info', 'warn', 'error'].forEach(function(level) {
-					if(opts[level] === false) newConsole[level] = noop;
-				});
-			}
-		}, this);
+		else {
+			newConsole = {
+				logger: logger,
+				debug: this.debug,
+				log: this.log,
+				info: this.info,
+				warn: this.warn,
+				error: this.error,
+				set: function (opts) {
+					['log', 'debug', 'info', 'warn', 'error'].forEach(function(level) {
+						if(opts[level] === false) newConsole[level] = noop;
+					});
+				}
+			};
+		}
 
 		if(typeof thing !== 'function') {
 			this.loggers[thing] = newConsole;

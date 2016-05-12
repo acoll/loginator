@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "main": "index.js",
   "dependencies": {
-    "babel-plugin-transform-object-assign": "^6.8.0",
     "colors": "^1.1.2"
   }
 }
