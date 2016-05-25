@@ -55,6 +55,7 @@ function extendLogger (c, thing) {
 
 		var originals = {
 			log: c.log,
+            debug: c.debug,
 			info: c.info,
 			warn: c.warn,
 			error: c.error
@@ -83,6 +84,7 @@ function extendLogger (c, thing) {
 	} else {
 		var string = '[' + thing + ']';
 		c.log = c.log.bind(c, string);
+        c.debug = c.debug.bind(c, string);
 		c.info = c.info.bind(c, string);
 		c.warn = c.warn.bind(c, string);
 		c.error = c.error.bind(c, string);
